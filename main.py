@@ -37,7 +37,7 @@ def text_analysis(text, area):
         response = requests.post(
             'http://localhost:11434/api/generate',
             json={
-                'model': 'gemma:2b',
+                'model': 'mistral:latest',
                 'prompt': prompt,
                 'stream': False
             },
