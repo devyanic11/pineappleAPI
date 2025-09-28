@@ -1,10 +1,23 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # Import CORS middleware
 from pydantic import BaseModel
 import requests
 from keybert import KeyBERT
 
 app = FastAPI(title="Text Analysis API")
 
+
+origins = [
+    "*",  
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+)
 
 # Define request body
 class AnalyzeRequest(BaseModel):
@@ -59,6 +72,7 @@ def text_analysis(text, area):
     except Exception as e:
         return {"error": f"Failed to parse Ollama response: {str(e)}"}
 
+
 @app.post("/analyze")
 def analyze_text(req: AnalyzeRequest):
     response = dict()
@@ -69,10 +83,12 @@ def analyze_text(req: AnalyzeRequest):
 
 @app.post("/get_tag")
 def getTag(data: TextInput):
-    keywords = kw_model.extract_keywords(data.text,
-                                         keyphrase_ngram_range=(1, 2),
-                                         stop_words="english",
-                                         top_n=1)
+    keywords = kw_model.extract_keywords(
+        data.text,
+        keyphrase_ngram_range=(1, 2),
+        stop_words="english",
+        top_n=1
+    )
     tag = keywords[0][0] if keywords else None
     return {"tag": tag}
 
